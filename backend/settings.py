@@ -37,7 +37,32 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+
+    # 3rd party
+    'rest_framework',
+    'drf_yasg',
+
+    # Local apps
+    'apps.users',
+    'apps.core',
+    'apps.api',
 ]
+
+# Modelo de usuario personalizado
+AUTH_USER_MODEL = 'my_users.User'
+
+# REST Framework
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
