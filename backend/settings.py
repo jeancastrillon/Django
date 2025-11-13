@@ -47,10 +47,11 @@ INSTALLED_APPS = [
     'apps.users',
     'apps.core',
     'apps.api',
+    'apps.gestion',    
 ]
 
 # Modelo de usuario personalizado
-AUTH_USER_MODEL = 'my_users.User'
+AUTH_USER_MODEL = 'users_app.User'
 
 # REST Framework
 REST_FRAMEWORK = {

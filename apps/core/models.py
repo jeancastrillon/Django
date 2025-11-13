@@ -1,11 +1,12 @@
 from django.db import models
-from django.utils import timezone
 
-class TimeStampedModel(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+class PruebaCore(models.Model):
+    nombre = models.CharField(max_length=100)
+    creado_en = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.nombre
 
     class Meta:
-        abstract = True
-
-# Create your models here.
+        verbose_name = "Prueba Core"
+        verbose_name_plural = "Pruebas Core"
