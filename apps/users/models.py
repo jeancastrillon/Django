@@ -1,35 +1,22 @@
-# apps/users/models.py
-from django.contrib.auth.models import AbstractUser  
+from django.contrib.auth.models import AbstractUser
+from apps.core.models import TimeStampedModel
 from django.db import models
-from django.utils import timezone
+from apps.users.managers import UserManager
 
-class User(AbstractUser):
-    email = models.EmailField(unique=True, verbose_name="Correo")
-    rol = models.CharField(
-        max_length=50,
-        choices=[
-            ('admin', 'Administrador'),
-            ('soporte', 'Soporte'),
-            ('cliente', 'Cliente')
-        ],
-        default='cliente'
-    )
-    ultimo_acceso = models.DateTimeField(null=True, blank=True)
-    activo = models.BooleanField(default=True)
+class User(models.Model):
+    email = None
+    email = models.EmailField(unique=True, null=False, blank=False)
+    username = models.CharField(max_length=150, unique=True)  # Necesario
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name']
+    REQUIRED_FIELDS = ['username']
+
+    objects = UserManager()
 
     def __str__(self):
-        return f"{self.get_full_name()} ({self.email})"
-
-    def save(self, *args, **kwargs):
-        if self.pk:
-            self.ultimo_acceso = timezone.now()
-        super().save(*args, **kwargs)
+        return self.email
 
     class Meta:
-        verbose_name = "Usuario"
-        verbose_name_plural = "Usuarios"
-
-# Create your models here.
+        abstract = True  # ← IMPORTANTE: misma tabla

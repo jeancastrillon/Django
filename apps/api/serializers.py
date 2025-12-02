@@ -1,11 +1,31 @@
 from rest_framework import serializers
-from apps.core.models import TimeStampedModel
+from apps.gestion.models import Cliente, Proyecto, PlantillaFormulario, Ticket
 
-class BaseModelSerializer(serializers.ModelSerializer):
-    created_at = serializers.DateTimeField(read_only=True)
-    updated_at = serializers.DateTimeField(read_only=True)
+# Cliente
+class ClienteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cliente
+        fields = '__all__'
+
+# Proyecto
+class ProyectoSerializer(serializers.ModelSerializer):
+    cliente = ClienteSerializer(read_only=True)
 
     class Meta:
-        model = TimeStampedModel
+        model = Proyecto
         fields = '__all__'
-        abstract = True
+
+# PlantillaFormulario
+class PlantillaFormularioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlantillaFormulario
+        fields = '__all__'
+
+# Ticket
+class TicketSerializer(serializers.ModelSerializer):
+    plantilla = PlantillaFormularioSerializer(read_only=True)
+    proyecto = ProyectoSerializer(read_only=True)
+
+    class Meta:
+        model = Ticket
+        fields = '__all__'

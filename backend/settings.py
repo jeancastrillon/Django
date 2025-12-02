@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from datetime import timedelta
+from drf_spectacular.utils import extend_schema
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +28,7 @@ SECRET_KEY = 'django-insecure-v6wsex4tul7-e)6cr0*i5#@-rsmh7&awb68dqye+8s55qs*+00
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -37,35 +40,65 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
 
     # 3rd party
     'rest_framework',
+    'rest_framework_simplejwt',
+    'drf_spectacular',
+    'corsheaders',
+    'django_filters',
     'drf_yasg',
+    
 
-    # Local apps
+    # Local apps - ¡ORDEN IMPORTANTE!
     'apps.users',
-    'apps.core',
+    'apps.core',      
     'apps.api',
-    'apps.gestion',    
+    'apps.gestion', 
+     
+    
 ]
 
+# === CONFIGURACIÓN DE SPECTACULAR ===
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Sistema de Tickets - Prácticas Universitarias',
+    'DESCRIPTION': 'API REST con área pública y privada (JWT)',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    
+    # Esto ordena y agrupa automáticamente por tags
+    'TAGS': [
+        {'name': 'Auth', 'description': 'Autenticación JWT'},
+        {'name': 'Público', 'description': 'Endpoints sin login (clientes externos)'},
+        {'name': 'Clientes (Staff)', 'description': 'Gestión completa de clientes'},
+        {'name': 'Proyectos (Staff)', 'description': 'Gestión completa de proyectos'},
+    ],
+    'COMPONENT_SPLIT_REQUEST': True,
+}
 # Modelo de usuario personalizado
-AUTH_USER_MODEL = 'users_app.User'
+#AUTH_USER_MODEL = 'apps.users.User'
 
 # REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.IsAuthenticated',   
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
 }
 
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}
+
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -73,6 +106,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "https://tufrontend.com",
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -150,3 +187,37 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+os.environ['PYTHONUTF8'] = '1'
+
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': True,
+    'SECURITY_DEFINITIONS': {
+        'Basic': {'type': 'basic'},
+        'Bearer': {'type': 'apiKey', 'name': 'Authorization', 'in': 'header'}
+    }
+}
+
+# === CONFIGURACIÓN BONITA DE SWAGGER (drf-spectacular) ===
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Sistema de Gestión de Tickets - Prácticas Universitarias',
+    'DESCRIPTION': 'API REST con área pública y privada JWT',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    
+    # Esto hace que Swagger nunca más se rompa aunque haya campos raros
+    'IGNORE_UNKNOWN_FIELDS': True,
+    'PREPROCESSING_HOOKS': [],
+    'POSTPROCESSING_HOOKS': [],
+    'DISABLE_ERRORS_AND_WARNINGS': True,           
+    'ENUM_NAME_OVERRIDES': {},
+    'ENABLE_LIST_MECHANISM': 'none',
+    
+    'TAGS': [
+        {'name': 'auth', 'description': 'Autenticación JWT - Login'},
+        {'name': 'Público', 'description': 'Endpoints sin login'},
+        {'name': 'Clientes (Staff)', 'description': 'Gestión completa de clientes'},
+        {'name': 'Proyectos (Staff)', 'description': 'Gestión completa de proyectos'},
+    ],
+}

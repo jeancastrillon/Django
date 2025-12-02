@@ -1,58 +1,27 @@
 from django.contrib import admin
-from .models import (
-    Cliente,
-    Proyecto,
-    PlantillaFormulario,
-    CampoFormulario,
-    Ticket,
-    Funcion,
-    ANS
-)
+from .models import Cliente, Proyecto, PlantillaFormulario, Ticket
 
-
-class CampoFormularioInline(admin.TabularInline):
-    model = CampoFormulario
-    extra = 1
-
-
+# Registro simple y limpio de todos los modelos
 @admin.register(Cliente)
 class ClienteAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'apellido', 'email', 'estado')  
+    list_display = ('nombre', 'apellido', 'email', 'estado')
     search_fields = ('nombre', 'apellido', 'email')
-
+    list_filter = ('estado',)
 
 @admin.register(Proyecto)
 class ProyectoAdmin(admin.ModelAdmin):
-    list_display = ('nombre_proyecto', 'cliente', 'estado')
-    list_filter = ('estado',)  
-    search_fields = ('nombre_proyecto',)
-
+    list_display = ('nombre_proyecto', 'cliente', 'activo')
+    search_fields = ('nombre_proyecto', 'cliente__nombre', 'cliente__apellido')
+    list_filter = ('activo',)
 
 @admin.register(PlantillaFormulario)
 class PlantillaFormularioAdmin(admin.ModelAdmin):
-    list_display = ('nombre_plantilla', 'proyecto', 'activo')
-    list_filter = ('activo',)
-    inlines = [CampoFormularioInline]
-    search_fields = ('nombre_plantilla',)
-
+    list_display = ('proyecto',)
+    # Puedes ver el JSON en detalle si quieres, pero así está bien
 
 @admin.register(Ticket)
 class TicketAdmin(admin.ModelAdmin):
-    list_display = ('ticket_id', 'titulo', 'proyecto', 'estado')
-    list_filter = ('estado', 'prioridad')
-    search_fields = ('titulo', 'ticket_id')
-
-
-@admin.register(Funcion)
-class FuncionAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'tipo', 'estado')
-    list_filter = ('estado',)
-
-
-@admin.register(ANS)
-class ANSAdmin(admin.ModelAdmin):
-    list_display = ('nombre_ans', 'tiempo_respuesta_max', 'tiempo_resolucion_max')
-    search_fields = ('nombre_ans',)
-
-
-# Register your models here.
+    list_display = ('id', 'titulo', 'proyecto', 'estado', 'creado_el')
+    list_filter = ('estado', 'creado_el')
+    search_fields = ('titulo', 'proyecto__nombre_proyecto')
+    readonly_fields = ('creado_el',)

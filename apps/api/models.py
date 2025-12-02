@@ -12,4 +12,4 @@ class PruebaAPI(models.Model):
         verbose_name = "Prueba API"
         verbose_name_plural = "Pruebas API"
 
-# Create your models here.
+# Create your models here
